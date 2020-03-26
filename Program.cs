@@ -1,45 +1,41 @@
 ﻿using System;
-using System.Net;
 using System.Net.Sockets;
 using System.IO;
 
-namespace Serverside
+namespace ClientSideChat
 {
     class Program
     {
         static void Main(string[] args)
         {
+            TcpClient client = null;
+            client = new TcpClient("127.0.0.1", 8888);
+            NetworkStream ns = client.GetStream();
+       
+            StreamReader sr = new StreamReader(ns);
 
-            TcpListener server = new TcpListener(8888); // Constructor 8888 is port for listening
-            server.Start();
-            Console.WriteLine("Server started and waiting for client.");
+            Console.WriteLine(sr.ReadLine());
+            string age = Console.ReadLine();
+            Console.WriteLine(age);
+            Console.WriteLine(sr.ReadLine());
+            Console.WriteLine(sr.ReadLine());
+            Console.WriteLine(sr.ReadLine());
 
-            // Step-2 Create Socket where client communicate with server
-            Socket socketForClients = server.AcceptSocket();
+            // Send some message to Server from CLIENT
+            StreamWriter sww = new StreamWriter(ns);
+            //Console.WriteLine("Message from Client to Server is :");
+            //sw.WriteLine("\nHello From Client to Server ");
+            //sw.Flush();
+            NetworkStream nsw = client.GetStream();
+            StreamWriter sw = new StreamWriter(nsw);
+            sww.WriteLine("hello from Client1");
+            sww.WriteLine("hello from Client2");
+            sww.WriteLine("hello from Client3");
+            sww.Flush();
 
-            if (socketForClients.Connected)
-            {
-                // Server creates virtual file through network stream
-                NetworkStream ns = new NetworkStream(socketForClients);
-                // Send message to client
-                StreamWriter sw = new StreamWriter(ns); // ns gives path of the file
-                //Console.WriteLine("Message from server for Client:: Welcome to server");
-                sw.WriteLine("Welcome Client");
-                sw.WriteLine("Enter your age:");
-                sw.WriteLine("Welcome Client");
+            sw.Close();
+            ns.Close();
 
-                sw.Flush(); // it push message to network stream
-
-                // Code for reading data from Client
-                StreamReader sr = new StreamReader(ns);
-                // Console.WriteLine("HEre is Message from Client" + sr.ReadLine());
-                Console.WriteLine(sr.ReadLine());
-                Console.WriteLine(sr.ReadLine()); Console.WriteLine(sr.ReadLine()); Console.WriteLine(sr.ReadLine());
-                // Close the socket
-                socketForClients.Close();
-
-
-            }
         }
     }
 }
